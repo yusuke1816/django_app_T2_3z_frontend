@@ -23,16 +23,37 @@ import {
 export default function Header() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const access = localStorage.getItem('access');
-    setIsLoggedIn(!!access);
+    if (!access) {
+      setIsLoggedIn(false);
+      setUsername(null);
+      return;
+    }
+
+    setIsLoggedIn(true);
+
+    fetch('http://localhost:8000/api/users/me/', {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    })
+      .then(res => res.ok ? res.json() : Promise.reject('認証エラー'))
+      .then(data => {
+        setUsername(data.username);
+      })
+      .catch(() => {
+        setUsername(null);
+      });
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('access');
     setIsLoggedIn(false);
+    setUsername(null);
     router.push('/hello');
   };
 
@@ -83,6 +104,9 @@ export default function Header() {
                 ログアウト
               </button>
               <UserCircleIcon className="h-6 w-6 text-green-600" />
+              {username && (
+                <span className="ml-2 text-gray-900 font-semibold">{username} さん</span>
+              )}
             </>
           ) : (
             <Link href="/auth" className="flex items-center gap-1 hover:text-green-500 transition-colors">
@@ -93,7 +117,7 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile Drawer */}
+      {/* モバイルメニュー */}
       <Dialog as="div" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white p-6 sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
@@ -139,6 +163,9 @@ export default function Header() {
                   ログアウト
                 </button>
                 <UserCircleIcon className="h-6 w-6 text-green-600" />
+                {username && (
+                  <span className="ml-2 text-gray-900 font-semibold">{username} さん</span>
+                )}
               </>
             ) : (
               <Link href="/auth" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-gray-900 hover:text-green-500">
