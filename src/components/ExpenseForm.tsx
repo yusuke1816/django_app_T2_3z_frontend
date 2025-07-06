@@ -17,12 +17,25 @@ export default function ExpenseForm() {
     currency: 'JPY',
     category: 'food',
     date: '',
+    user_id: '',  // ユーザーIDをフォームに追加
   });
 
   const [catOpen, setCatOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // ユーザーIDを取得 (localStorage から)
+    const storedUserId = localStorage.getItem('userId'); // localStorageからuserIdを取得
+
+    // ユーザーIDが存在しない場合、ユニークなIDを生成してlocalStorageに保存
+    if (!storedUserId) {
+      const uniqueUserId = 'user-' + Math.random().toString(36).substr(2, 9); // ランダムなユニークID
+      localStorage.setItem('userId', uniqueUserId); // ユーザーIDをlocalStorageに保存
+      setForm(prev => ({ ...prev, user_id: uniqueUserId })); // ユーザーIDをフォームに設定
+    } else {
+      setForm(prev => ({ ...prev, user_id: storedUserId })); // 既存のユーザーIDをフォームに設定
+    }
+
     const onClickOutside = (e: MouseEvent) => {
       if (catRef.current && !catRef.current.contains(e.target as Node)) {
         setCatOpen(false);
@@ -30,7 +43,7 @@ export default function ExpenseForm() {
     };
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
-  }, []);
+  }, []); // 初回レンダリング時のみ実行
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -42,33 +55,52 @@ export default function ExpenseForm() {
     setForm(prev => ({ ...prev, category: id }));
     setCatOpen(false);
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    const formData = { ...form, amount: parseFloat(form.amount) };
+  
     try {
       const res = await fetch('http://localhost:8000/api/expenses/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify(formData), // 修正されたフォームデータを送信
       });
-
-      if (!res.ok) throw new Error('送信に失敗しました');
-
-      const data = await res.json();
-      alert(`登録成功: ${JSON.stringify(data)}`);
-
-      setForm({ title: '', amount: '', currency: 'JPY', category: 'food', date: '' });
+  
+      // レスポンスが正常かチェック
+      if (!res.ok) {
+        const errorText = await res.text(); // エラーレスポンスのテキストを取得
+        console.error('サーバーエラー:', errorText);
+        throw new Error('送信に失敗しました');
+      }
+  
+      // レスポンスがJSON形式かチェック
+      const contentType = res.headers.get('Content-Type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await res.json();  // JSONとしてパース
+        alert(`登録成功: ${JSON.stringify(data)}`);
+      } else {
+        const errorText = await res.text();
+        alert(`サーバーからの応答がJSONではありません: ${errorText}`);
+      }
+  
+      setForm({ title: '', amount: '', currency: 'JPY', category: 'food', date: '', user_id: '' });
     } catch (error: any) {
       alert(error.message);
     }
   };
+  
 
   const selectedCategory = categories.find(c => c.id === form.category);
 
   return (
-    <form onSubmit={handleSubmit}   className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md space-y-6 mt-18"
-    >
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md space-y-6 mt-18">
       <h2 className="text-xl font-bold text-gray-800 mb-4">支出を追加</h2>
+
+      {/* ユーザーIDの表示 */}
+      <div className="text-sm font-medium text-gray-700">
+        <p>ユーザーID: <span className="font-semibold">{form.user_id}</span></p>
+      </div>
 
       {/* 内容 */}
       <div>
@@ -127,7 +159,7 @@ export default function ExpenseForm() {
         </div>
       </div>
 
-      {/* カテゴリー カスタムセレクト（そのまま） */}
+      {/* カテゴリー */}
       <div className="relative" ref={catRef}>
         <label className="block text-sm font-medium text-gray-700 mb-1">カテゴリ</label>
         <button

@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';  
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogPanel,
@@ -21,11 +21,17 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function Header() {
-  const router = useRouter(); 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  useEffect(() => {
+    const access = localStorage.getItem('access');
+    setIsLoggedIn(!!access);
+  }, []);
+
   const handleLogout = () => {
+    localStorage.removeItem('access');
     setIsLoggedIn(false);
     router.push('/hello');
   };
@@ -33,7 +39,6 @@ export default function Header() {
   return (
     <header className="bg-white shadow">
       <nav className="mx-auto flex max-w-5xl items-center justify-between p-4 sm:px-6 lg:px-8" aria-label="Global">
-        {/* Logo */}
         <div className="flex items-center gap-2 lg:flex-1">
           <BanknotesIcon className="h-6 w-6 text-green-600" />
           <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-green-500 transition-colors">
@@ -41,7 +46,6 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* Mobile menu button */}
         <div className="flex lg:hidden">
           <button
             onClick={() => setMobileMenuOpen(true)}
@@ -52,7 +56,6 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Desktop menu */}
         <div className="hidden lg:flex lg:gap-x-6 text-gray-700 font-medium items-center">
           {isLoggedIn ? (
             <>
@@ -68,7 +71,7 @@ export default function Header() {
                 <PlusCircleIcon className="h-5 w-5" />
                 支出追加
               </Link>
-              <Link href="/settings" className="flex items-center gap-1 hover:text-green-500 transition-colors">
+              <Link href="/set" className="flex items-center gap-1 hover:text-green-500 transition-colors">
                 <Cog6ToothIcon className="h-5 w-5" />
                 設定
               </Link>
@@ -90,7 +93,7 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile drawer */}
+      {/* Mobile Drawer */}
       <Dialog as="div" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white p-6 sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
@@ -121,17 +124,16 @@ export default function Header() {
                   <PlusCircleIcon className="h-5 w-5" />
                   支出追加
                 </Link>
-                <Link href="/settings" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-gray-900 hover:text-green-500">
+                <Link href="/set" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 text-gray-900 hover:text-green-500">
                   <Cog6ToothIcon className="h-5 w-5" />
                   設定
                 </Link>
-
                 <button
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center gap-2 text-gray-900 hover:text-green-500 bg-transparent border-none cursor-pointer"
+                  className="flex items-center gap-2 text-gray-900 hover:text-red-500 bg-transparent border-none cursor-pointer"
                 >
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                   ログアウト
