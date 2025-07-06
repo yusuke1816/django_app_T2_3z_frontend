@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
+import { useRouter } from 'next/navigation';
 
 // フォームデータの型
 interface FormData {
@@ -18,6 +19,8 @@ export default function SignUpForm() {
     password: '',
     confirmPassword: '',
   });
+
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,7 +60,9 @@ export default function SignUpForm() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(data.message);  // 成功メッセージ
+        alert(data.message);
+        router.push('/hello'); 
+          // 成功メッセージ
       } else {
         const errorData = await response.json();
         alert(errorData.error);  // エラーメッセージ
