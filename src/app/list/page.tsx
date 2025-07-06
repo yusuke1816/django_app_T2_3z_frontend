@@ -13,6 +13,7 @@ type Expense = {
 };
 
 export default function AddExpensePage() {
+    
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);  // 追加：認証チェック＆データ取得待ち用

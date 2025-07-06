@@ -17,32 +17,47 @@ export default function ExpenseForm() {
     currency: 'JPY',
     category: 'food',
     date: '',
-    user_id: '',  // ユーザーIDをフォームに追加
+    user_id: '', // ユーザーIDをフォームに追加
   });
+
+  const [username, setUsername] = useState<string | null>(null); // 追加
 
   const [catOpen, setCatOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // ユーザーIDを取得 (localStorage から)
-    const storedUserId = localStorage.getItem('userId'); // localStorageからuserIdを取得
+    const access = localStorage.getItem('access'); // トークン取得
 
-    // ユーザーIDが存在しない場合、ユニークなIDを生成してlocalStorageに保存
-    if (!storedUserId) {
-      const uniqueUserId = 'user-' + Math.random().toString(36).substr(2, 9); // ランダムなユニークID
-      localStorage.setItem('userId', uniqueUserId); // ユーザーIDをlocalStorageに保存
-      setForm(prev => ({ ...prev, user_id: uniqueUserId })); // ユーザーIDをフォームに設定
-    } else {
-      setForm(prev => ({ ...prev, user_id: storedUserId })); // 既存のユーザーIDをフォームに設定
+    if (!access) {
+      setUsername(null);
+      return;
     }
 
+    fetch('http://localhost:8000/api/users/me/', {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    })
+      .then(res => (res.ok ? res.json() : Promise.reject('認証エラー')))
+      .then(data => {
+        setUsername(data.username);
+        setForm(prev => ({ ...prev, user_id: data.id })); // APIのユーザーIDをフォームにセット
+      })
+      .catch(() => {
+        setUsername(null);
+      });
+
+    // カテゴリドロップダウンの外クリック検知
     const onClickOutside = (e: MouseEvent) => {
       if (catRef.current && !catRef.current.contains(e.target as Node)) {
         setCatOpen(false);
       }
     };
     document.addEventListener('mousedown', onClickOutside);
-    return () => document.removeEventListener('mousedown', onClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+    };
   }, []); // 初回レンダリング時のみ実行
 
   const handleChange = (
@@ -55,41 +70,50 @@ export default function ExpenseForm() {
     setForm(prev => ({ ...prev, category: id }));
     setCatOpen(false);
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const formData = { ...form, amount: parseFloat(form.amount) };
-  
+    const token = localStorage.getItem('access'); // JWT トークン取得
+
     try {
       const res = await fetch('http://localhost:8000/api/expenses/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData), // 修正されたフォームデータを送信
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // 認証情報を追加
+        },
+        body: JSON.stringify(formData),
       });
-  
-      // レスポンスが正常かチェック
+
       if (!res.ok) {
-        const errorText = await res.text(); // エラーレスポンスのテキストを取得
+        const errorText = await res.text();
         console.error('サーバーエラー:', errorText);
         throw new Error('送信に失敗しました');
       }
-  
-      // レスポンスがJSON形式かチェック
+
       const contentType = res.headers.get('Content-Type');
       if (contentType && contentType.includes('application/json')) {
-        const data = await res.json();  // JSONとしてパース
+        const data = await res.json();
         alert(`登録成功: ${JSON.stringify(data)}`);
       } else {
         const errorText = await res.text();
         alert(`サーバーからの応答がJSONではありません: ${errorText}`);
       }
-  
-      setForm({ title: '', amount: '', currency: 'JPY', category: 'food', date: '', user_id: '' });
+
+      setForm({
+        title: '',
+        amount: '',
+        currency: 'JPY',
+        category: 'food',
+        date: '',
+        user_id: '',
+      });
     } catch (error: any) {
       alert(error.message);
     }
   };
-  
 
   const selectedCategory = categories.find(c => c.id === form.category);
 
@@ -97,11 +121,15 @@ export default function ExpenseForm() {
     <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded-md shadow-md space-y-6 mt-18">
       <h2 className="text-xl font-bold text-gray-800 mb-4">支出を追加</h2>
 
+      {/* ユーザー名表示 */}
+      <div className="text-sm font-medium text-gray-700">
+        <p>ユーザー名: <span className="font-semibold">{username ?? 'ログインしてください'}</span></p>
+      </div>
+
       {/* ユーザーIDの表示 */}
       <div className="text-sm font-medium text-gray-700">
         <p>ユーザーID: <span className="font-semibold">{form.user_id}</span></p>
       </div>
-
       {/* 内容 */}
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
