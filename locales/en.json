@@ -1,0 +1,16 @@
+{
+    "settings.title": "Settings",
+    "settings.description": "You can change various app settings.",
+    "theme.title": "Theme Settings",
+    "theme.toggle": "Enable dark mode",
+    "theme.current": "Current mode",
+    "theme.dark": "🌙 Dark Mode",
+    "theme.light": "☀️ Light Mode",
+    "notification.title": "Notification Settings",
+    "notification.toggle": "Receive email notifications",
+    "notification.on": "📧 Email notifications are enabled.",
+    "notification.off": "🔕 Email notifications are disabled.",
+    "language.title": "Language Settings",
+    "language.current": "Selected language"
+  }
+  

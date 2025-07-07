@@ -129,12 +129,14 @@ export default function Header() {
                 <ArrowRightOnRectangleIcon className="h-5 w-5" />
                 ログアウト
               </button>
-              <UserCircleIcon className={`${darkMode ? 'text-green-500' : 'text-green-700'} h-6 w-6`} />
-              {username && (
-                <span className={`${darkMode ? 'text-gray-200' : 'text-gray-900'} ml-2 font-semibold`}>
-                  {username} さん
-                </span>
-              )}
+              <div className="flex items-center gap-1">
+  <UserCircleIcon className={`${darkMode ? 'text-green-500' : 'text-green-700'} h-6 w-6`} />
+  {username && (
+    <span className={`${darkMode ? 'text-gray-200' : 'text-gray-900'} text-sm font-semibold`}>
+      {username} さん
+    </span>
+  )}
+</div>
             </>
           ) : (
             <Link
@@ -215,12 +217,14 @@ export default function Header() {
                   <ArrowRightOnRectangleIcon className="h-5 w-5" />
                   ログアウト
                 </button>
-                <UserCircleIcon className={`${darkMode ? 'text-green-500' : 'text-green-700'} h-6 w-6`} />
-                {username && (
-                  <span className={`${darkMode ? 'text-gray-200' : 'text-gray-900'} ml-2 font-semibold`}>
-                    {username} さん
-                  </span>
-                )}
+                <div className="flex items-center gap-1">
+  <UserCircleIcon className={`${darkMode ? 'text-green-500' : 'text-green-700'} h-6 w-6`} />
+  {username && (
+    <span className={`${darkMode ? 'text-gray-200' : 'text-gray-900'} text-sm font-semibold`}>
+      {username} さん
+    </span>
+  )}
+</div>
               </>
             ) : (
               <Link

@@ -54,6 +54,11 @@ export default function AddExpensePage() {
       })
       .catch((error) => {
         console.error("❌ fetch エラー:", error);
+    
+        // ここでトークン削除
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+    
         setExpenses([]);
         setLoading(false);
         router.push('/hello');
