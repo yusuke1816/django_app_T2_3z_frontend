@@ -48,6 +48,8 @@ export default function Header() {
     localStorage.removeItem('access');
     setIsLoggedIn(false);
     setUsername(null);
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
     router.push('/hello');
   };
 

@@ -10,12 +10,7 @@ export default function NotFound() {
   return (
     <main className="grid min-h-full place-items-center bg-white dark:bg-gray-900 px-6 py-24 sm:py-32 lg:px-8 text-gray-900 dark:text-gray-100">
       <div className="text-center max-w-xl px-4">
-        <button
-          onClick={toggleDarkMode}
-          className="mb-6 rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
-        >
-          {darkMode ? 'ライトモードに切替' : 'ダークモードに切替'}
-        </button>
+     
 
         <p className="text-base font-semibold text-indigo-600 dark:text-indigo-400">404</p>
         <h1 className="mt-4 text-5xl font-bold tracking-tight sm:text-7xl">
