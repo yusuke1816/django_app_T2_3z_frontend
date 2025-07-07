@@ -1,66 +1,109 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 
 type Friend = {
   id: number;
   username: string;
-  email: string;
 };
 
-export default function FriendsPage() {
+export default function FriendList() {
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('access');
-    if (!token) {
-      setError('ログインしてください');
-      setLoading(false);
-      return;
-    }
-
-    fetch('http://localhost:8000/api/friends/', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('友達情報の取得に失敗しました');
-        return res.json();
-      })
-      .then(data => {
+    const fetchFriends = async () => {
+      const access = localStorage.getItem('access');
+      if (!access) {
+        setMessage('ログインが必要です');
+        return;
+      }
+      try {
+        const res = await fetch('http://localhost:8000/api/friends/', {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        });
+        if (!res.ok) throw new Error('フレンド一覧の取得に失敗しました');
+        const data: Friend[] = await res.json();
         setFriends(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
+      } catch (err: any) {
+        setMessage(err.message || 'エラーが発生しました');
+      }
+    };
+    fetchFriends();
   }, []);
 
-  if (loading) return <p className="p-4">読み込み中...</p>;
-  if (error) return <p className="p-4 text-red-600">{error}</p>;
+  const handleUnfriend = async (friendId: number) => {
+    const access = localStorage.getItem('access');
+    if (!access) {
+      setMessage('ログインが必要です');
+      return;
+    }
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/friends/${friendId}/remove/`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${access}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || '解除に失敗しました');
+      }
+      setFriends((prev) => prev.filter((f) => f.id !== friendId));
+      setMessage('フレンドを解除しました');
+    } catch (err: any) {
+      setMessage(err.message || 'エラーが発生しました');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">Friends</h1>
-      <ul className="max-w-3xl mx-auto space-y-4">
-        {friends.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400">友達がいません</p>
-        ) : (
-          friends.map(friend => (
-            <li
-              key={friend.id}
-              className="p-4 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow"
-            >
-              <h2 className="text-2xl font-semibold">{friend.username}</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{friend.email}</p>
-            </li>
-          ))
-        )}
-      </ul>
+    <div className="py-16 min-h-screen text-gray-900 dark:text-white">
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="max-w-md rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg">
+          <h2 className="text-lg font-bold mb-6 text-gray-900 dark:text-white">フレンド一覧</h2>
+
+          {message && (
+            <p className="mb-4 text-sm text-red-500 dark:text-red-400">{message}</p>
+          )}
+
+          {friends.length === 0 && !message && (
+            <p className="text-gray-700 dark:text-gray-300">フレンドがいません</p>
+          )}
+
+          <ul className="space-y-3 max-h-60 overflow-y-auto mb-6">
+            {friends.map((friend) => (
+              <li
+                key={friend.id}
+                className="flex justify-between items-center p-3 border border-gray-300 rounded dark:border-gray-600"
+              >
+                <Link
+                  href={`/friend/${friend.id}`}
+                  className="text-blue-600 hover:underline disabled:opacity-50"
+                >
+                  {friend.username}
+                </Link>
+                <button
+                  disabled={loading}
+                  onClick={() => handleUnfriend(friend.id)}
+                  className="text-red-600 hover:underline disabled:opacity-50"
+                >
+                  解除
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

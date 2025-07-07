@@ -86,8 +86,11 @@ export default function AddExpensePage() {
           メニュー
         </h2>
         <nav className="flex flex-col space-y-3 mt-4">
-  <Link href="/teams" className="hover:underline">my teams</Link>
-  <Link href="/friends" className="hover:underline">frends</Link>
+        <Link href="/friends" className="hover:underline">フレンド</Link>
+  <Link href="/teams" className="hover:underline">フレンド検索</Link>
+  
+  <Link href="/friend-requests" className="hover:underline">フレンド申請</Link>
+  <Link href="/notifications" className="hover:underline">通知</Link>
 </nav>
       </aside>
 
@@ -95,7 +98,8 @@ export default function AddExpensePage() {
       <main className="flex-1 px-8 py-12">
         <h1 className="text-5xl font-extrabold mb-8 text-center">支出の合計</h1>
         <div className="flex flex-col md:flex-row md:space-x-30 space-y-6 md:space-y-0">
-          <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/2">
+           
             <TotalExpenses expenses={expenses} />
           </div>
           <div className="w-full md:w-1/2 mt-4 md:mt-0">

@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from 'react';
 
 type Expense = {
-  id: string;
-  title: string;
-  amount: number;
-  currency: string;
-  category: string;
-  date: string;
-};
+    id: string;
+    title: string;
+    amount: number;
+    currency?: string;  // ? をつけて optional にする
+    category: string;
+    date: string;
+  };
+  
 
 type Props = {
   expenses: Expense[];
@@ -35,8 +36,10 @@ export default function MainPage({ expenses }: Props) {
         return res.json();
       })
       .then(data => {
+        console.log("APIレスポンス totalAmount:", data.totalAmount);
         setTotalAmount(Number(data.totalAmount));
       })
+      
       .catch(err => {
         console.error('❌ 合計取得エラー:', err);
       });
