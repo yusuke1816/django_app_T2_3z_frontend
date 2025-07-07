@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { DarkModeContext } from '../../../context/DarkModeContext';
 
 export default function LoginPage() {
+  const { darkMode } = useContext(DarkModeContext);
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,7 @@ export default function LoginPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username, // ← Djangoは username を期待する
+          username,
           password,
         }),
       });
@@ -29,7 +32,6 @@ export default function LoginPage() {
         throw new Error(data.detail || 'ログインに失敗しました');
       }
 
-      // JWTトークンを保存（例：localStorage）
       localStorage.setItem('access', data.access);
       localStorage.setItem('refresh', data.refresh);
 
@@ -42,24 +44,40 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-md">
+    <main
+      className={`max-w-md mx-auto mt-10 p-6 rounded-md shadow-md ${
+        darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-900'
+      }`}
+    >
       <h1 className="text-2xl font-bold mb-4">ログイン</h1>
 
       {error && (
-        <p className="mb-4 text-sm text-red-600 bg-red-100 p-2 rounded">
+        <p
+          className={`mb-4 text-sm p-2 rounded ${
+            darkMode ? 'bg-red-700 text-red-200' : 'bg-red-100 text-red-600'
+          }`}
+        >
           {error}
         </p>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium"
+          >
             ユーザー名
           </label>
           <input
             id="username"
             type="text"
-            className="mt-1 block w-full border rounded px-3 py-2 text-sm"
+            className={`mt-1 block w-full rounded px-3 py-2 text-sm border ${
+              darkMode
+                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:border-green-500 focus:ring-green-500'
+                : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900 focus:border-green-600 focus:ring-green-600'
+            }`}
+            placeholder="ユーザー名を入力"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -67,13 +85,21 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium"
+          >
             パスワード
           </label>
           <input
             id="password"
             type="password"
-            className="mt-1 block w-full border rounded px-3 py-2 text-sm"
+            className={`mt-1 block w-full rounded px-3 py-2 text-sm border ${
+              darkMode
+                ? 'bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-200 focus:border-green-500 focus:ring-green-500'
+                : 'bg-white border-gray-300 placeholder-gray-500 text-gray-900 focus:border-green-600 focus:ring-green-600'
+            }`}
+            placeholder="パスワードを入力"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -83,7 +109,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition"
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? 'ログイン中...' : 'ログイン'}
         </button>

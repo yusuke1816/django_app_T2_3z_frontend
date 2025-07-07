@@ -1,16 +1,22 @@
+// app/layout.tsx (RootLayout)
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './globals.css';
 
+import { DarkModeProvider } from '../../context/DarkModeContext';  // 追加
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body className="flex flex-col min-h-screen">
-        <Header/>
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        <DarkModeProvider>  {/* ここでラップ */}
+          <Header />
+          <main className="flex-grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+            {children}
+          </main>
+          <Footer />
+        </DarkModeProvider>
       </body>
     </html>
   );

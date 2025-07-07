@@ -1,6 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useContext } from 'react';
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 type Expense = {
   id: number;
@@ -14,7 +15,6 @@ type Props = {
   expenses: Expense[];
 };
 
-// フォームと同じカテゴリ一覧
 const categories = [
   { id: 'food', label: '食費', emoji: '🍙' },
   { id: 'transport', label: '交通費', emoji: '🚃' },
@@ -22,34 +22,50 @@ const categories = [
   { id: 'other', label: 'その他', emoji: '📦' },
 ];
 
-// id→emoji変換用マップ
 const categoryEmojiMap: Record<string, string> = categories.reduce((acc, cur) => {
   acc[cur.id] = cur.emoji;
   return acc;
 }, {} as Record<string, string>);
 
 export default function ExpenseList({ expenses }: Props) {
+  const { darkMode } = useContext(DarkModeContext);
+
   return (
-    <ul role="list" className="divide-y divide-gray-100 border border-gray-200 rounded-lg">
+    <ul
+      role="list"
+      className={`divide-y rounded-lg border ${
+        darkMode
+          ? 'divide-gray-700 border-gray-700'
+          : 'divide-gray-100 border-gray-200'
+      }`}
+    >
       {expenses.map((expense) => (
         <li
           key={expense.id}
-          className="flex justify-between gap-x-6 px-4 py-4 hover:bg-gray-50 transition"
+          className={`flex justify-between gap-x-6 px-4 py-4 transition ${
+            darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+          }`}
         >
           <div className="flex min-w-0 gap-x-4">
-            {/* カテゴリーアイコン（emoji） */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-2xl">
+            {/* カテゴリーアイコン */}
+            <div
+              className={`flex h-12 w-12 items-center justify-center rounded-full text-2xl ${
+                darkMode ? 'bg-gray-600' : 'bg-gray-100'
+              }`}
+            >
               {categoryEmojiMap[expense.category] || '❓'}
             </div>
 
-            {/* タイトルと日付 */}
             <div className="min-w-0 flex-auto">
-              <p className="text-sm font-semibold text-gray-900">{expense.title}</p>
-              <p className="mt-1 text-xs text-gray-500">日付: {expense.date}</p>
+              <p className={`text-sm font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                {expense.title}
+              </p>
+              <p className={`mt-1 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                日付: {expense.date}
+              </p>
             </div>
           </div>
 
-          {/* 金額 */}
           <div className="shrink-0 sm:flex sm:flex-col sm:items-end">
             <p className="text-sm font-semibold text-green-600">
               ¥{expense.amount.toLocaleString()}
