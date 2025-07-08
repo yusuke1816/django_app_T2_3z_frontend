@@ -41,7 +41,7 @@ export default function FriendDetailPage() {
       }
 
       try {
-        const res = await fetch(`http://localhost:8000/api/friends/${id}/expenses/`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${id}/expenses/`, {
           headers: {
             Authorization: `Bearer ${access}`,
           },
@@ -66,7 +66,7 @@ export default function FriendDetailPage() {
         return;
       }
       try {
-        const res = await fetch('http://localhost:8000/api/friends/', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, {
           headers: {
             Authorization: `Bearer ${access}`,
           },

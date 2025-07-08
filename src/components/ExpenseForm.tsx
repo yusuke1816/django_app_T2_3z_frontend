@@ -34,7 +34,7 @@ export default function ExpenseForm() {
       return;
     }
 
-    fetch('http://localhost:8000/api/users/me/', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me/`, {
       headers: {
         Authorization: `Bearer ${access}`,
       },
@@ -77,7 +77,7 @@ export default function ExpenseForm() {
     const token = localStorage.getItem('access');
 
     try {
-      const res = await fetch('http://localhost:8000/api/expenses/', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/expenses/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

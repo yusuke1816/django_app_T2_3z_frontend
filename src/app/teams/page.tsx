@@ -31,7 +31,7 @@ export default function AddFriendForm() {
     }
 
     try {
-      const res = await fetch(`http://localhost:8000/api/users/search/?q=${encodeURIComponent(query)}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/search/?q=${encodeURIComponent(query)}`, {
         headers: {
           Authorization: `Bearer ${access}`,
         },
@@ -58,7 +58,7 @@ export default function AddFriendForm() {
     setMessage(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/friends/request/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/request/`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${access}`,

@@ -26,7 +26,7 @@ export default function MainPage({ expenses }: Props) {
       return;
     }
 
-    fetch('http://localhost:8000/api/expenses/total-jpy/', {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/expenses/total-jpy/`, {
       headers: {
         Authorization: `Bearer ${token}`, // 🔥 認証追加
       },

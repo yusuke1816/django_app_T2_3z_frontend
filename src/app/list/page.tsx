@@ -28,7 +28,7 @@ export default function AddExpensePage() {
     }
 
     const delay = setTimeout(() => {
-      fetch(`http://localhost:8000/api/expenses/?q=${search}`, {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/expenses/?q=${search}`, {
         headers: {
           Authorization: `Bearer ${access}`,
         },

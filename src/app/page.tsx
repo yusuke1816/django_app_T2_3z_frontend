@@ -30,7 +30,7 @@ export default function AddExpensePage() {
       return;
     }
 
-    fetch("http://localhost:8000/api/expenses/", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/expenses/`, {
       headers: {
         Authorization: `Bearer ${access}`,
       },

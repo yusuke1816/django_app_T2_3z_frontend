@@ -21,7 +21,7 @@ export default function FriendList() {
         return;
       }
       try {
-        const res = await fetch('http://localhost:8000/api/friends/', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/`, {
           headers: {
             Authorization: `Bearer ${access}`,
           },
@@ -46,7 +46,7 @@ export default function FriendList() {
     setMessage(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/friends/${friendId}/remove/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/${friendId}/remove/`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${access}`,

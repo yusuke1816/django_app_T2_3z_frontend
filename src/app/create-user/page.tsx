@@ -50,7 +50,7 @@ export default function SignUpForm() {
     };
 
     try {
-      const response = await fetch('http://localhost:8000/api/auth/signup/', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',  // JSONとして送信することを指定

@@ -24,7 +24,7 @@ export default function FriendRequestsPage() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch('http://localhost:8000/api/friends/requests/', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/requests/`, {
         headers: {
           Authorization: `Bearer ${access}`,
         },
@@ -54,7 +54,7 @@ export default function FriendRequestsPage() {
     setMessage(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/friends/request/${requestId}/respond/`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/friends/request/${requestId}/respond/`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${access}`,
