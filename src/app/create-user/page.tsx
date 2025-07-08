@@ -65,7 +65,15 @@ export default function SignUpForm() {
           // 成功メッセージ
       } else {
         const errorData = await response.json();
-        alert(errorData.error);  // エラーメッセージ
+        if (errorData.username) {
+          alert(errorData.username[0]);  // 例: "同じユーザー名が既に登録済みです。"
+        } else if (errorData.email) {
+          alert(errorData.email[0]);
+        } else if (errorData.password) {
+          alert(errorData.password[0]);
+        } else {
+          alert(errorData.detail || '登録に失敗しました');
+        }
       }
     } catch (error) {
       console.error('Error:', error);
