@@ -25,6 +25,9 @@ export default function AddExpensePage() {
 
   useEffect(() => {
     const access = localStorage.getItem('access');
+    console.log(localStorage.getItem('access'))
+    console.log("✅ API URL:", process.env.NEXT_PUBLIC_API_URL);
+
     if (!access) {
       router.push("/hello");
       return;
@@ -55,6 +58,7 @@ export default function AddExpensePage() {
         setLoading(false);
         router.push('/hello');
       });
+    
   }, [router]);
 
   const toggleDarkMode = () => {
