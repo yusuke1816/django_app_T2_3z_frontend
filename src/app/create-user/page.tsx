@@ -1,10 +1,8 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { useRouter } from 'next/navigation';
 
-// フォームデータの型
 interface FormData {
   username: string;
   email: string;
@@ -20,6 +18,7 @@ export default function SignUpForm() {
     confirmPassword: '',
   });
 
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,41 +31,39 @@ export default function SignUpForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const { username, email, password, confirmPassword } = formData;
 
-    // バリデーション
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
     }
 
-    // リクエストデータをJSON形式で準備
     const requestData = {
       username,
       email,
       password,
-      confirm_password: confirmPassword,  // 変数名が異なる場合
+      confirm_password: confirmPassword,
     };
+
+    setLoading(true);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup/`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',  // JSONとして送信することを指定
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData),  // requestDataをJSONに変換
+        body: JSON.stringify(requestData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        alert(data.message);
-        router.push('/hello'); 
-          // 成功メッセージ
+        alert(data.message || 'Signup successful');
+        router.push('/hello');
       } else {
         const errorData = await response.json();
         if (errorData.username) {
-          alert(errorData.username[0]);  // 例: "同じユーザー名が既に登録済みです。"
+          alert(errorData.username[0]);
         } else if (errorData.email) {
           alert(errorData.email[0]);
         } else if (errorData.password) {
@@ -77,14 +74,15 @@ export default function SignUpForm() {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('There was an error with the request');
+      alert('通信エラーが発生しました');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <form className="px-20 mt-15 mb-10" onSubmit={handleSubmit}>
       <div className="space-y-12">
-        {/* Sign Up Section */}
         <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base/7 font-semibold text-gray-900">Sign Up</h2>
           <p className="mt-1 text-sm/6 text-gray-600">
@@ -92,7 +90,6 @@ export default function SignUpForm() {
           </p>
 
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            {/* Username */}
             <div className="sm:col-span-4">
               <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
                 Username
@@ -111,7 +108,6 @@ export default function SignUpForm() {
               </div>
             </div>
 
-            {/* Email Address */}
             <div className="sm:col-span-4">
               <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
                 Email Address
@@ -130,7 +126,6 @@ export default function SignUpForm() {
               </div>
             </div>
 
-            {/* Password */}
             <div className="sm:col-span-4">
               <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
                 Password
@@ -149,7 +144,6 @@ export default function SignUpForm() {
               </div>
             </div>
 
-            {/* Confirm Password */}
             <div className="sm:col-span-4">
               <label htmlFor="confirm-password" className="block text-sm/6 font-medium text-gray-900">
                 Confirm Password
@@ -170,13 +164,15 @@ export default function SignUpForm() {
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="pt-5">
           <button
             type="submit"
-            className="inline-flex justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+            disabled={loading}
+            className={`inline-flex justify-center rounded-md py-2 px-3 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
           >
-            Sign Up
+            {loading ? '登録中...' : 'Sign Up'}
           </button>
         </div>
       </div>
