@@ -46,6 +46,7 @@ export default function SignUpForm() {
     };
 
     setLoading(true);
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup/`, {
         method: 'POST',
@@ -56,7 +57,16 @@ export default function SignUpForm() {
         body: JSON.stringify(requestData),
       });
     
-      const data = await response.json(); // 一度だけ読み込む
+      const text = await response.text(); // 一旦 text として読む
+    
+      let data;
+      try {
+        data = JSON.parse(text); // JSONとしてパースを試みる
+      } catch {
+        console.error('サーバーからのHTMLエラーレスポンス:', text);
+        alert('エラーが発生しました（詳細は開発者ツールで確認）');
+        return;
+      }
     
       if (response.ok) {
         alert(data.message || 'Signup successful');
@@ -79,6 +89,7 @@ export default function SignUpForm() {
       setLoading(false);
     }
     
+  };
 
 
   return (
@@ -179,4 +190,4 @@ export default function SignUpForm() {
       </div>
     </form>
   );
-}}
+}
