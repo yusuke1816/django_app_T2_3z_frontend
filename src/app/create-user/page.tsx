@@ -10,13 +10,6 @@ interface FormData {
   confirmPassword: string;
 }
 
-interface ErrorResponse {
-  username?: string[];
-  email?: string[];
-  password?: string[];
-  detail?: string;
-}
-
 export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>({
     username: '',
@@ -69,15 +62,22 @@ export default function SignUpForm() {
         alert(data.message || 'Signup successful');
         router.push('/hello');
       } else {
-        const errorData: ErrorResponse = await response.json();
-        if (errorData.username) {
-          alert(errorData.username[0]);
-        } else if (errorData.email) {
-          alert(errorData.email[0]);
-        } else if (errorData.password) {
-          alert(errorData.password[0]);
-        } else {
-          alert(errorData.detail || '登録に失敗しました');
+        // JSON パースを試みる（失敗時は text を出力）
+        try {
+          const errorData = await response.json();
+          if (errorData.username) {
+            alert(errorData.username[0]);
+          } else if (errorData.email) {
+            alert(errorData.email[0]);
+          } else if (errorData.password) {
+            alert(errorData.password[0]);
+          } else {
+            alert(errorData.detail || '登録に失敗しました');
+          }
+        } catch {
+          const errorText = await response.text();
+          console.error('エラーレスポンス:', errorText);
+          alert('エラー内容を確認してください（開発者ツールのコンソールに出力済み）');
         }
       }
     } catch (error) {
@@ -87,6 +87,7 @@ export default function SignUpForm() {
       setLoading(false);
     }
   };
+
 
   return (
     <form className="px-20 mt-15 mb-10" onSubmit={handleSubmit}>
