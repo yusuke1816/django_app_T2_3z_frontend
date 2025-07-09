@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/16/solid';
 import { DarkModeContext } from '../../context/DarkModeContext';
+import { useRouter } from 'next/navigation';
 
 const categories = [
   { id: 'food', label: '食費', emoji: '🍙' },
@@ -13,6 +14,7 @@ const categories = [
 
 export default function ExpenseForm() {
   const { darkMode } = useContext(DarkModeContext);
+  const router = useRouter();
 
   const [form, setForm] = useState({
     title: '',
@@ -26,6 +28,9 @@ export default function ExpenseForm() {
   const [username, setUsername] = useState<string | null>(null);
   const [catOpen, setCatOpen] = useState(false);
   const catRef = useRef<HTMLDivElement>(null);
+
+  // 成功表示のための状態を追加
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const access = localStorage.getItem('access');
@@ -94,7 +99,8 @@ export default function ExpenseForm() {
       const contentType = res.headers.get('Content-Type');
       if (contentType?.includes('application/json')) {
         const data = await res.json();
-        alert(`登録成功: ${JSON.stringify(data)}`);
+        // 登録成功時に success を true に
+        setSuccess(true);
       }
 
       setForm({
@@ -103,7 +109,7 @@ export default function ExpenseForm() {
         currency: 'JPY',
         category: 'food',
         date: '',
-        user_id: '',
+        user_id: form.user_id, // ユーザーIDはリセットしない
       });
     } catch (error: any) {
       alert(error.message);
@@ -111,15 +117,41 @@ export default function ExpenseForm() {
   };
 
   const selectedCategory = categories.find(c => c.id === form.category);
-
   return (
     <form
       onSubmit={handleSubmit}
-      className={`max-w-md mx-auto p-6 rounded-md shadow-md space-y-6 mt-18 ${
+      className={`relative max-w-md mx-auto p-6 rounded-md shadow-md space-y-6 mt-18 ${
         darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900'
       }`}
     >
       <h2 className="text-xl font-bold mb-4">支出を追加</h2>
+      {success && (
+        <div
+          className={`absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center rounded-md z-50 p-6 ${
+            darkMode ? 'bg-gray-900 bg-opacity-90 text-green-200' : 'bg-white bg-opacity-90 text-green-800'
+          }`}
+        >
+          <div className="max-w-sm w-full p-8 rounded-md shadow-lg bg-inherit">
+            <div className="text-3xl mb-4">✅ 登録が完了しました！</div>
+            <div className="flex justify-center gap-4 mt-6">
+              <button
+                type="button"
+                onClick={() => setSuccess(false)}
+                className="px-4 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-semibold"
+              >
+                続けて入力する
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/')}
+                className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-700 text-white font-semibold"
+              >
+                一覧へ戻る
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="text-sm font-medium">
         ユーザー名: <span className="font-semibold">{username ?? 'ログインしてください'}</span>
