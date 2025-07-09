@@ -62,7 +62,6 @@ export default function SignUpForm() {
         alert(data.message || 'Signup successful');
         router.push('/hello');
       } else {
-        // JSON パースを試みる（失敗時は text を出力）
         try {
           const errorData = await response.json();
           if (errorData.username) {
@@ -74,14 +73,14 @@ export default function SignUpForm() {
           } else {
             alert(errorData.detail || '登録に失敗しました');
           }
-        } catch {
-          const errorText = await response.text();
-          console.error('エラーレスポンス:', errorText);
-          alert('エラー内容を確認してください（開発者ツールのコンソールに出力済み）');
+        } catch (jsonError) {
+          const errorHtml = await response.text();
+          console.error('サーバーからのHTMLエラーレスポンス:', errorHtml);
+          alert('エラーが発生しました（詳細は開発者ツールで確認）');
         }
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('通信エラー:', error);
       alert('通信エラーが発生しました');
     } finally {
       setLoading(false);
