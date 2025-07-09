@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface FormData {
   username: string;
@@ -34,7 +35,7 @@ export default function SignUpForm() {
     const { username, email, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
-      alert('Passwords do not match');
+      toast.error('パスワードが一致しません');
       return;
     }
 
@@ -56,45 +57,38 @@ export default function SignUpForm() {
         },
         body: JSON.stringify(requestData),
       });
-    
-      const text = await response.text(); // 一旦 text として読む
-    
+
+      const text = await response.text();
       let data;
       try {
-        data = JSON.parse(text); // JSONとしてパースを試みる
+        data = JSON.parse(text);
       } catch {
         console.error('サーバーからのHTMLエラーレスポンス:', text);
-        alert('エラーが発生しました（詳細は開発者ツールで確認）');
+        toast.error('エラーが発生しました（詳細は開発者ツールで確認）');
         return;
       }
+
       if (response.ok) {
-        alert(data.message || 'Signup successful');
+        toast.success(data.message || '登録に成功しました');
         router.push('/hello');
       } else {
         if (data.username) {
-          alert(data.username[0] || 'そのユーザー名は既に使われています');
+          toast.error(data.username[0]);
         } else if (data.email) {
-          alert(data.email[0] || 'そのメールアドレスは既に使われています');
+          toast.error(data.email[0]);
         } else if (data.password) {
-          alert(data.password[0] || 'パスワードに問題があります');
-        } else if (data.detail) {
-          alert(data.detail);
+          toast.error(data.password[0]);
         } else {
-          alert('登録に失敗しました。もう一度お試しください');
+          toast.error(data.detail || '登録に失敗しました');
         }
       }
-      
     } catch (error) {
       console.error('通信エラー:', error);
-      alert('通信エラーが発生しました');
+      toast.error('通信エラーが発生しました');
     } finally {
       setLoading(false);
     }
-
-    
-    
   };
-
 
   return (
     <form className="px-20 mt-15 mb-10" onSubmit={handleSubmit}>
