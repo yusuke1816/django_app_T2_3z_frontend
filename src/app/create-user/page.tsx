@@ -89,20 +89,19 @@ export default function SignUpForm() {
       setLoading(false);
     }
   };
-
   return (
     <form className="px-20 mt-15 mb-10" onSubmit={handleSubmit}>
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Sign Up</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900">サインアップ</h2>
           <p className="mt-1 text-sm/6 text-gray-600">
-            Fill in your details to create an account. We will never share your information without your permission.
+            アカウントを作成するために情報を入力してください。あなたの許可なしに情報を共有することはありません。
           </p>
-
+  
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-4">
               <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
-                Username
+                ユーザー名
               </label>
               <div className="mt-2">
                 <input
@@ -117,10 +116,10 @@ export default function SignUpForm() {
                 />
               </div>
             </div>
-
+  
             <div className="sm:col-span-4">
               <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-                Email Address
+                メールアドレス
               </label>
               <div className="mt-2">
                 <input
@@ -135,10 +134,10 @@ export default function SignUpForm() {
                 />
               </div>
             </div>
-
+  
             <div className="sm:col-span-4">
               <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
-                Password
+                パスワード
               </label>
               <div className="mt-2">
                 <input
@@ -153,10 +152,10 @@ export default function SignUpForm() {
                 />
               </div>
             </div>
-
+  
             <div className="sm:col-span-4">
               <label htmlFor="confirm-password" className="block text-sm/6 font-medium text-gray-900">
-                Confirm Password
+                パスワード（確認）
               </label>
               <div className="mt-2">
                 <input
@@ -173,7 +172,7 @@ export default function SignUpForm() {
             </div>
           </div>
         </div>
-
+  
         <div className="pt-5">
           <button
             type="submit"
@@ -182,10 +181,11 @@ export default function SignUpForm() {
               loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
             }`}
           >
-            {loading ? '登録中...' : 'Sign Up'}
+            {loading ? '登録中...' : '登録'}
           </button>
         </div>
       </div>
     </form>
   );
+  
 }
