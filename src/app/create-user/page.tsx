@@ -10,6 +10,13 @@ interface FormData {
   confirmPassword: string;
 }
 
+interface ErrorResponse {
+  username?: string[];
+  email?: string[];
+  password?: string[];
+  detail?: string;
+}
+
 export default function SignUpForm() {
   const [formData, setFormData] = useState<FormData>({
     username: '',
@@ -62,7 +69,7 @@ export default function SignUpForm() {
         alert(data.message || 'Signup successful');
         router.push('/hello');
       } else {
-        const errorData = await response.json();
+        const errorData: ErrorResponse = await response.json();
         if (errorData.username) {
           alert(errorData.username[0]);
         } else if (errorData.email) {
