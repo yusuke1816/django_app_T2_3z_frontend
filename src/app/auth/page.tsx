@@ -20,12 +20,21 @@ export default function LoginPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/token/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json',
-        'Accept': 'application/json',  },
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify({ username, password }),
       });
-
-      const data = await res.json();
+      
+      if (!res.ok) {
+        const errorText = await res.text();  // ← HTMLを読めるように
+        console.error('エラーレスポンス:', errorText);
+        throw new Error('APIリクエスト失敗');
+      }
+      
+      const data = await res.json(); // 安全に呼べる
+      
 
       if (!res.ok) {
         throw new Error(data.detail || 'ログインに失敗しました');
