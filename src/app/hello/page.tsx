@@ -51,7 +51,7 @@ export default function Example() {
           href="/auth"
           className="rounded-md bg-green-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
         >
-          login
+          ログイン
         </Link>
         <Link
           href="/create-user"
@@ -59,7 +59,7 @@ export default function Example() {
             darkMode ? 'text-gray-300' : 'text-gray-900'
           }`}
         >
-          sign in<span aria-hidden="true">→</span>
+          新規登録<span aria-hidden="true">→</span>
         </Link>
       </div>
     </main>

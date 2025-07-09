@@ -2,7 +2,6 @@
 
 import { useState, useContext } from 'react';
 import { DarkModeContext } from '../../../context/DarkModeContext';
-import { fetchWithAuth } from '@/lib/fetchWithAuth';
 
 export default function LoginPage() {
   const { darkMode } = useContext(DarkModeContext);
@@ -26,26 +25,29 @@ export default function LoginPage() {
         },
         body: JSON.stringify({ username, password }),
       });
-      
-      if (!res.ok) {
-        const errorText = await res.text();  // ← HTMLを読めるように
-        console.error('エラーレスポンス:', errorText);
-        throw new Error('APIリクエスト失敗');
-      }
-      
-      const data = await res.json(); // 安全に呼べる
-      
+
+      const contentType = res.headers.get('Content-Type');
 
       if (!res.ok) {
-        throw new Error(data.detail || 'ログインに失敗しました');
+        // エラーの内容をJSONでパースできるか確認
+        if (contentType?.includes('application/json')) {
+          const errorData = await res.json();
+          console.error('エラー内容:', errorData);
+          throw new Error(errorData.detail || 'ログインに失敗しました');
+        } else {
+          const errorText = await res.text();
+          console.error('HTMLエラー:', errorText);
+          throw new Error('サーバーに接続できませんでした。しばらくしてからお試しください。');
+        }
       }
 
+      const data = await res.json();
       localStorage.setItem('access', data.access);
       localStorage.setItem('refresh', data.refresh);
-
       window.location.href = '/';
     } catch (err: any) {
-      setError(err.message || 'エラーが発生しました');
+      console.error('ログイン失敗:', err);
+      setError('ユーザー名またはパスワードが正しくありません');
     } finally {
       setLoading(false);
     }
@@ -60,13 +62,34 @@ export default function LoginPage() {
       <h1 className="text-2xl font-bold mb-4">ログイン</h1>
 
       {error && (
-        <p
-          className={`mb-4 text-sm p-2 rounded ${
-            darkMode ? 'bg-red-700 text-red-200' : 'bg-red-100 text-red-600'
-          }`}
+        <div
+          role="alert"
+          className={`
+            mb-4 flex items-center gap-2 rounded-md px-4 py-3 text-sm font-medium shadow-md
+            ${
+              darkMode
+                ? 'bg-red-800 text-red-200 ring-1 ring-red-500'
+                : 'bg-red-100 text-red-700 ring-1 ring-red-400'
+            }
+            animate-fadeIn
+          `}
         >
-          {error}
-        </p>
+          <svg
+            className="w-5 h-5 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 8v4m0 4h.01M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"
+            />
+          </svg>
+          <p>{error}</p>
+        </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
