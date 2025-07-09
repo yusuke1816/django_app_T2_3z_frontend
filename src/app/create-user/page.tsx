@@ -67,27 +67,31 @@ export default function SignUpForm() {
         alert('エラーが発生しました（詳細は開発者ツールで確認）');
         return;
       }
-    
       if (response.ok) {
         alert(data.message || 'Signup successful');
         router.push('/hello');
       } else {
         if (data.username) {
-          alert(data.username[0]);
+          alert(data.username[0] || 'そのユーザー名は既に使われています');
         } else if (data.email) {
-          alert(data.email[0]);
+          alert(data.email[0] || 'そのメールアドレスは既に使われています');
         } else if (data.password) {
-          alert(data.password[0]);
+          alert(data.password[0] || 'パスワードに問題があります');
+        } else if (data.detail) {
+          alert(data.detail);
         } else {
-          alert(data.detail || '登録に失敗しました');
+          alert('登録に失敗しました。もう一度お試しください');
         }
       }
+      
     } catch (error) {
       console.error('通信エラー:', error);
       alert('通信エラーが発生しました');
     } finally {
       setLoading(false);
     }
+
+    
     
   };
 
