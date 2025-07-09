@@ -46,7 +46,6 @@ export default function SignUpForm() {
     };
 
     setLoading(true);
-
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup/`, {
         method: 'POST',
@@ -56,27 +55,21 @@ export default function SignUpForm() {
         },
         body: JSON.stringify(requestData),
       });
-
+    
+      const data = await response.json(); // 一度だけ読み込む
+    
       if (response.ok) {
-        const data = await response.json();
         alert(data.message || 'Signup successful');
         router.push('/hello');
       } else {
-        try {
-          const errorData = await response.json();
-          if (errorData.username) {
-            alert(errorData.username[0]);
-          } else if (errorData.email) {
-            alert(errorData.email[0]);
-          } else if (errorData.password) {
-            alert(errorData.password[0]);
-          } else {
-            alert(errorData.detail || '登録に失敗しました');
-          }
-        } catch (jsonError) {
-          const errorHtml = await response.text();
-          console.error('サーバーからのHTMLエラーレスポンス:', errorHtml);
-          alert('エラーが発生しました（詳細は開発者ツールで確認）');
+        if (data.username) {
+          alert(data.username[0]);
+        } else if (data.email) {
+          alert(data.email[0]);
+        } else if (data.password) {
+          alert(data.password[0]);
+        } else {
+          alert(data.detail || '登録に失敗しました');
         }
       }
     } catch (error) {
@@ -85,7 +78,7 @@ export default function SignUpForm() {
     } finally {
       setLoading(false);
     }
-  };
+    
 
 
   return (
@@ -186,4 +179,4 @@ export default function SignUpForm() {
       </div>
     </form>
   );
-}
+}}
