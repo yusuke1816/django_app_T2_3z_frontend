@@ -12,13 +12,10 @@ interface Expense {
   user_id: string;
 }
 
-export default function DleteForm({ expense }: { expense?: Expense }) {
- {
+export default function DeleteForm({ expense }: { expense?: Expense }) {
   return (
     <>
       <ExpenseForm />
     </>
   );
-}
-
 }
