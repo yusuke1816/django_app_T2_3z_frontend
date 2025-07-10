@@ -117,6 +117,11 @@ export default function ExpenseForm() {
   };
 
   const selectedCategory = categories.find(c => c.id === form.category);
+  
+
+  
+  
+  
   return (
     <form
       onSubmit={handleSubmit}

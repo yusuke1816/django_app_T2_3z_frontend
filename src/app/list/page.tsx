@@ -10,13 +10,14 @@ type Expense = {
   amount: number;
   date: string;
   category: string;
+  currency?: string;
 };
 
 export default function AddExpensePage() {
-    
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);  // 追加：認証チェック＆データ取得待ち用
+  const [loading, setLoading] = useState(true);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function AddExpensePage() {
         })
         .then((data) => {
           setExpenses(data);
-          setLoading(false); // データ取得完了でloadingをfalseに
+          setLoading(false);
         })
         .catch((err) => {
           console.error("❌ API エラー:", err);
@@ -51,8 +52,28 @@ export default function AddExpensePage() {
     return () => clearTimeout(delay);
   }, [search, router]);
 
+  const handleDelete = async (id: number) => {
+    const token = localStorage.getItem("access");
+    if (!token) return;
+    if (!confirm("本当に削除しますか？")) return;
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/expenses/${id}/`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`, // ← 修正
+        },
+      });
+
+      if (!res.ok) throw new Error("削除に失敗しました");
+
+      setExpenses((prev) => prev.filter((expense) => expense.id !== id));
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
   if (loading) {
-    // 認証チェック＆データ取得中はローディングなど表示
     return (
       <div className="flex justify-center items-center min-h-screen">
         <p className="text-gray-500">読み込み中...</p>
@@ -70,7 +91,11 @@ export default function AddExpensePage() {
         className="w-full mb-4 px-4 py-2 border rounded-md"
       />
 
-      <ExpenseList expenses={expenses} />
+      <ExpenseList
+        expenses={expenses}
+        onEdit={(expense) => setSelectedExpense(expense)}
+        onDelete={(id) => handleDelete(id)}
+      />
     </div>
   );
 }

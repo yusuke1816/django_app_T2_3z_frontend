@@ -13,6 +13,8 @@ type Expense = {
 
 type Props = {
   expenses: Expense[];
+  onEdit: (expense: Expense) => void;
+  onDelete: (id: number) => void;
 };
 
 const categories = [
@@ -27,16 +29,14 @@ const categoryEmojiMap: Record<string, string> = categories.reduce((acc, cur) =>
   return acc;
 }, {} as Record<string, string>);
 
-export default function ExpenseList({ expenses }: Props) {
+export default function ExpenseList({ expenses, onEdit, onDelete }: Props) {
   const { darkMode } = useContext(DarkModeContext);
 
   return (
     <ul
       role="list"
       className={`divide-y rounded-lg border ${
-        darkMode
-          ? 'divide-gray-700 border-gray-700'
-          : 'divide-gray-100 border-gray-200'
+        darkMode ? 'divide-gray-700 border-gray-700' : 'divide-gray-100 border-gray-200'
       }`}
     >
       {expenses.map((expense) => (
@@ -66,10 +66,25 @@ export default function ExpenseList({ expenses }: Props) {
             </div>
           </div>
 
-          <div className="shrink-0 sm:flex sm:flex-col sm:items-end">
+          <div className="shrink-0 sm:flex sm:flex-col sm:items-end space-y-2">
             <p className="text-sm font-semibold text-green-600">
               ¥{expense.amount.toLocaleString()}
             </p>
+
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => onEdit(expense)}
+                className="text-xs px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
+              >
+                編集
+              </button>
+              <button
+                onClick={() => onDelete(expense.id)}
+                className="text-xs px-2 py-1 rounded bg-red-500 text-white hover:bg-red-600"
+              >
+                削除
+              </button>
+            </div>
           </div>
         </li>
       ))}
